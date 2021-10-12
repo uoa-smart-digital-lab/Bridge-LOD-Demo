@@ -123,7 +123,7 @@ for basename in basenames:
     bpy.ops.export_scene.fbx(filepath = output_directory + '\\' + basename + '.fbx', use_selection = True, mesh_smooth_type = 'FACE', use_tspace = True, object_types = {'MESH'})
     
 # --------------------------------------------------------------------------------------------------------------
-# Clear the Scene again so as not to leave behind a big set of files
+# Clear the Scene again so as not to leave behind a big set of objects
 # --------------------------------------------------------------------------------------------------------------
 print ("Cleaning up")
 

@@ -38,25 +38,27 @@ bpy.ops.object.delete(use_global=False)
 for item in bpy.data.meshes:
     bpy.data.meshes.remove(item)
 
-# Get a list of all the sub directories
-obj_directories = glob.glob(input_directory + '\\*')
-
 # --------------------------------------------------------------------------------------------------------------
 # import the original objects
 # --------------------------------------------------------------------------------------------------------------
 print ("Importing Original Meshes")
 
+# Get a list of all the sub directories
+obj_directories = glob.glob(input_directory + '\\*')
+
+# For each section, copy over the materials, and import the obj file
 for dir in obj_directories:
-    # Get obj file names
+    print ("    " + obj_file)
+        
+    # Get file names
     obj_file = glob.glob(dir + '\\*.obj')
     jpg_file = glob.glob(dir + '\\*.jpg')
     mtl_file = glob.glob(dir + '\\*.mtl')
-    print (obj_file)
         
-    # Import obj file
+    # Import obj file (assuming only one per folder)
     bpy.ops.import_scene.obj(filepath = obj_file[0])
     
-    # Copy mtl and jpg files
+    # Copy mtl and jpg files (assuming only one of each)
     shutil.copy(jpg_file[0], output_directory)
     shutil.copy(mtl_file[0], output_directory)
 

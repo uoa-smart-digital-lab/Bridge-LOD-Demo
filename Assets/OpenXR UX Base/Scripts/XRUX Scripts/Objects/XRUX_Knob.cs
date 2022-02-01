@@ -20,7 +20,7 @@ using UnityEngine.Events;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRUX_Knob
+public interface IXRUX_Knob
 {
     void Input(XRData newData);
 }
@@ -32,33 +32,19 @@ public interface _XRUX_Knob
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 [AddComponentMenu("OpenXR UX/Objects/XRUX Knob")]
-public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
+public class XRUX_Knob : MonoBehaviour, IXRUX_Knob
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("A turnable knob that integrates.\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Input( XRData ) - Float value to change the knob state as if it was being rotated.")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    [Header("The object that will change colour when touched and rotated.")]
+    public XRData.Mode mode = XRData.Mode.User; // For use in the inspector only
     public Renderer objectToColor; // The GameObject for the base of the knob - the one that needs to change colour and move when turned
-    [Header("The object that will move when rotated.")]
     public GameObject objectToMove; // The GameObject that will be rotated when clicked and turned
-
-    [Header("Materials for the different interactions states.")]
     public Material normalMaterial; // The material for when not pressed
     public Material activatedMaterial; // The material for when pressed
     public Material touchedMaterial; // The material for when touched
-
-    [Header("Maximum value of the knob, and the size of the click steps.")]
     public float maxValue = 10.0f; // The maximum value of the scale
     public float step = 1.0f; // The value by which the knob 'clicks' around
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("OUTPUTS")]
     public UnityXRDataEvent onChange; // Functions to call when the knob is being turned
     public UnityEvent onTouch; // Functions to call when first touched
     public UnityEvent onUntouch; // Functions to call when no longer touched
@@ -75,7 +61,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
     private Collider otherCollider; // The collider that hits the knob - we need this to determine the rotation.  Usually one of the pointers.
     private float clickedOnValue = 0.0f; // What the value was when the knob is clicked on.
     private float startRotation = 0.0f; // The starting rotation of the other collider.
-    private float currentValue = 0.0f; // The current angle of rotation (degrees).
+    private float currentRotation = 0.0f; // The current angle of rotation (degrees).
     private float prevSteppedValue = 0.0f; // The previous value sent as an event.
     private bool firstTime = true; // First time running?
     private bool isLeft = false;
@@ -85,7 +71,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
 
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Rotate the knob to the given value (in the range given by the min, max and step values)
+    // Rotate the knob to the given value (in the range given by the 0, max and step values)
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     public void Input (XRData newData)
     {
@@ -108,7 +94,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
         }
 
         // Save the value for next time
-        currentValue = prevSteppedValue = steppedValue;
+        currentRotation = prevSteppedValue = steppedValue;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -148,11 +134,12 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
         {
             if (otherCollider != null)
             {
+                Debug.Log("Rotating");
                 // Get the angle of rotation of the collided item (usually a pointer)
-                currentValue = clickedOnValue + (otherCollider.gameObject.transform.rotation.eulerAngles.z - startRotation) * 2.0f;
+                currentRotation = clickedOnValue + (otherCollider.gameObject.transform.rotation.eulerAngles.z - startRotation) * 2.0f;
 
                 // Normalise that value (to between 0 and 1)
-                float normalizedValue = (1.0f - (currentValue % 360.0f) / 360.0f);
+                float normalizedValue = (1.0f - (currentRotation % 360.0f) / 360.0f);
                 // Limit it to between min and max
                 float limitedValue = (normalizedValue * maxValue) % maxValue;
 
@@ -168,7 +155,6 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
                 if ((prevSteppedValue != steppedValue) || firstTime)
                 {
                     if (onChange != null) onChange.Invoke(new XRData(steppedValue));
-                    Debug.Log("OPENXRUX - Knob Rotated : " + steppedValue);
                 }
 
                 // Save the value for next time
@@ -247,7 +233,7 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
             {
                 clicked = true;
                 objectToColor.material = activatedMaterial;
-                clickedOnValue = currentValue;
+                clickedOnValue = currentRotation;
                 startRotation = otherCollider.gameObject.transform.rotation.eulerAngles.z;
             }
             else
@@ -255,6 +241,17 @@ public class XRUX_Knob : MonoBehaviour, _XRUX_Knob
                 clicked = false;
                 objectToColor.material = touchedMaterial;
             }
+        }
+
+        if ((theEvent.eventType == XRDeviceEventTypes.mouse_scroll) && (theEvent.eventAction == XRDeviceActions.UP) && touched)
+        {
+            float newSteppedValue = prevSteppedValue + step;
+            Input(new XRData((newSteppedValue >= maxValue) ? 0 : newSteppedValue));
+        }
+        if ((theEvent.eventType == XRDeviceEventTypes.mouse_scroll) && (theEvent.eventAction == XRDeviceActions.DOWN) && touched)
+        {
+            float newSteppedValue = prevSteppedValue - step;
+            Input(new XRData((newSteppedValue < 0) ? maxValue : newSteppedValue));
         }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------

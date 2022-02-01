@@ -40,6 +40,7 @@ public enum XRDeviceEventTypes {
     menu_button,
     scene,
     console,
+    mouse_scroll,
     _
 };
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -51,7 +52,7 @@ public enum XRDeviceEventTypes {
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 public enum XRDeviceActions
 {
-    TOUCH, CLICK, MOVE, LOOKAT, POINTAT, CHANGE, _
+    TOUCH, CLICK, MOVE, LOOKAT, POINTAT, CHANGE, UP, DOWN, _
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -86,7 +87,7 @@ public class XRDeviceEvents : UnityEvent<XREvent> { };
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Public functions
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public interface _XRRig_Manager
+public interface IXRRig_Manager
 {
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -96,19 +97,11 @@ public interface _XRRig_Manager
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 // Main class
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-public class XRRig_Manager : MonoBehaviour, _XRRig_Manager
+public class XRRig_Manager : MonoBehaviour, IXRRig_Manager
 {
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Public variables
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
-    [Header("____________________________________________________________________________________________________")]
-    [Header("The Smart Digital Lab OpenXR UX Base main device-to-Unity Event manager\n____________________________________________________________________________________________________")]
-    [Header("INPUTS\n\n - Data from the openXR Controllers.")]
-
-    [Header("____________________________________________________________________________________________________")]
-    [Header("SETTINGS")]
-    [Header("____________________________________________________________________________________________________")]
-    [Header("OUTPUTS")]
     public XRDeviceEvents XREventQueue; // The event queue that all the XR UX elements will need to look at to get events.
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -140,6 +133,7 @@ public class XRRig_Manager : MonoBehaviour, _XRRig_Manager
         // Get the devices in the left and right hands respectively
         InputDevices.GetDevicesAtXRNode(XRNode.LeftHand, leftHandDevices);
         InputDevices.GetDevicesAtXRNode(XRNode.RightHand, rightHandDevices);
+        Application.targetFrameRate = 90;
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -285,6 +279,35 @@ public class XRRig_Manager : MonoBehaviour, _XRRig_Manager
 
 
 
+    private void SendVectorEvent(XRDeviceEventTypes eventToTrigger, Vector2 twoDAxis)
+    {
+        XREvent eventToSend = new XREvent();
+        eventToSend.eventType = eventToTrigger;
+        eventToSend.eventVector = twoDAxis;
+        eventToSend.eventAction = XRDeviceActions.MOVE;
+
+        XREventQueue.Invoke(eventToSend);
+    }
+    private void SendKeyEvent(XRDeviceEventTypes eventToTrigger, XRDeviceActions eventAction, bool buttonState)
+    {
+        XREvent eventToSend = new XREvent();
+        eventToSend.eventType = eventToTrigger;
+        eventToSend.eventBool = buttonState;
+        eventToSend.eventAction = eventAction;
+
+        XREventQueue.Invoke(eventToSend);
+    }
+    private void SendMouseEvent(XRDeviceEventTypes eventToTrigger, XRDeviceActions eventAction)
+    {
+        XREvent eventToSend = new XREvent();
+        eventToSend.eventType = eventToTrigger;
+        eventToSend.eventAction = eventAction;
+
+        XREventQueue.Invoke(eventToSend);
+    }
+
+
+
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
     // Each frame, check for any new actions that need sending out.
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -292,35 +315,78 @@ public class XRRig_Manager : MonoBehaviour, _XRRig_Manager
     {
         TestForDevices();
 
-        // Check each of the buttons on the left and right controllers and send the appropriate event depending on what is happening.
-        //TestButton(leftHandDevices, CommonUsages.triggerButton,         XRDeviceEventTypes.left_trigger,        XRDeviceActions.CLICK);
-        TestButton(leftHandDevices, CommonUsages.primaryButton,         XRDeviceEventTypes.left_primary,        XRDeviceActions.CLICK);
-        TestButton(leftHandDevices, CommonUsages.secondaryButton,       XRDeviceEventTypes.left_secondary,      XRDeviceActions.CLICK);
-        //TestButton(leftHandDevices, CommonUsages.gripButton,            XRDeviceEventTypes.left_grip,           XRDeviceActions.CLICK);
-        TestButton(leftHandDevices, CommonUsages.primaryTouch,          XRDeviceEventTypes.left_primary,        XRDeviceActions.TOUCH);
-        TestButton(leftHandDevices, CommonUsages.secondaryTouch,        XRDeviceEventTypes.left_secondary,      XRDeviceActions.TOUCH);
-        TestButton(leftHandDevices, CommonUsages.primary2DAxisClick,    XRDeviceEventTypes.left_thumbstick,     XRDeviceActions.CLICK);
-        TestButton(leftHandDevices, CommonUsages.primary2DAxisTouch,    XRDeviceEventTypes.left_thumbstick,     XRDeviceActions.TOUCH);
-        TestButton(leftHandDevices, CommonUsages.menuButton,            XRDeviceEventTypes.menu_button,         XRDeviceActions.CLICK);
+        if ((leftHandDevices.Count > 0) || (rightHandDevices.Count > 0))
+        {
+            // Check each of the buttons on the left and right controllers and send the appropriate event depending on what is happening.
+            //TestButton(leftHandDevices, CommonUsages.triggerButton,         XRDeviceEventTypes.left_trigger,        XRDeviceActions.CLICK);
+            TestButton(leftHandDevices, CommonUsages.primaryButton,         XRDeviceEventTypes.left_primary,        XRDeviceActions.CLICK);
+            TestButton(leftHandDevices, CommonUsages.secondaryButton,       XRDeviceEventTypes.left_secondary,      XRDeviceActions.CLICK);
+            //TestButton(leftHandDevices, CommonUsages.gripButton,            XRDeviceEventTypes.left_grip,           XRDeviceActions.CLICK);
+            TestButton(leftHandDevices, CommonUsages.primaryTouch,          XRDeviceEventTypes.left_primary,        XRDeviceActions.TOUCH);
+            TestButton(leftHandDevices, CommonUsages.secondaryTouch,        XRDeviceEventTypes.left_secondary,      XRDeviceActions.TOUCH);
+            TestButton(leftHandDevices, CommonUsages.primary2DAxisClick,    XRDeviceEventTypes.left_thumbstick,     XRDeviceActions.CLICK);
+            TestButton(leftHandDevices, CommonUsages.primary2DAxisTouch,    XRDeviceEventTypes.left_thumbstick,     XRDeviceActions.TOUCH);
+            TestButton(leftHandDevices, CommonUsages.menuButton,            XRDeviceEventTypes.menu_button,         XRDeviceActions.CLICK);
 
-        //TestButton(rightHandDevices, CommonUsages.triggerButton,        XRDeviceEventTypes.right_trigger,       XRDeviceActions.CLICK);
-        TestButton(rightHandDevices, CommonUsages.primaryButton,        XRDeviceEventTypes.right_primary,       XRDeviceActions.CLICK);
-        TestButton(rightHandDevices, CommonUsages.secondaryButton,      XRDeviceEventTypes.right_secondary,     XRDeviceActions.CLICK);
-        //TestButton(rightHandDevices, CommonUsages.gripButton,           XRDeviceEventTypes.right_grip,          XRDeviceActions.CLICK);
-        TestButton(rightHandDevices, CommonUsages.primaryTouch,         XRDeviceEventTypes.right_primary,       XRDeviceActions.TOUCH);
-        TestButton(rightHandDevices, CommonUsages.secondaryTouch,       XRDeviceEventTypes.right_secondary,     XRDeviceActions.TOUCH);
-        TestButton(rightHandDevices, CommonUsages.primary2DAxisClick,   XRDeviceEventTypes.right_thumbstick,    XRDeviceActions.CLICK);
-        TestButton(rightHandDevices, CommonUsages.primary2DAxisTouch,   XRDeviceEventTypes.right_thumbstick,    XRDeviceActions.TOUCH);
+            //TestButton(rightHandDevices, CommonUsages.triggerButton,        XRDeviceEventTypes.right_trigger,       XRDeviceActions.CLICK);
+            TestButton(rightHandDevices, CommonUsages.primaryButton,        XRDeviceEventTypes.right_primary,       XRDeviceActions.CLICK);
+            TestButton(rightHandDevices, CommonUsages.secondaryButton,      XRDeviceEventTypes.right_secondary,     XRDeviceActions.CLICK);
+            //TestButton(rightHandDevices, CommonUsages.gripButton,           XRDeviceEventTypes.right_grip,          XRDeviceActions.CLICK);
+            TestButton(rightHandDevices, CommonUsages.primaryTouch,         XRDeviceEventTypes.right_primary,       XRDeviceActions.TOUCH);
+            TestButton(rightHandDevices, CommonUsages.secondaryTouch,       XRDeviceEventTypes.right_secondary,     XRDeviceActions.TOUCH);
+            TestButton(rightHandDevices, CommonUsages.primary2DAxisClick,   XRDeviceEventTypes.right_thumbstick,    XRDeviceActions.CLICK);
+            TestButton(rightHandDevices, CommonUsages.primary2DAxisTouch,   XRDeviceEventTypes.right_thumbstick,    XRDeviceActions.TOUCH);
 
-        // Check the status of the joystick movements
-        TestThumbStick(leftHandDevices, CommonUsages.primary2DAxis,     XRDeviceEventTypes.left_thumbstick);
-        TestThumbStick(rightHandDevices, CommonUsages.primary2DAxis,    XRDeviceEventTypes.right_thumbstick);
+            // Check the status of the joystick movements
+            TestThumbStick(leftHandDevices, CommonUsages.primary2DAxis,     XRDeviceEventTypes.left_thumbstick);
+            TestThumbStick(rightHandDevices, CommonUsages.primary2DAxis,    XRDeviceEventTypes.right_thumbstick);
 
-        // Check the status of the grip and trigger values
-        TestValue(leftHandDevices, CommonUsages.trigger,                XRDeviceEventTypes.left_trigger);
-        TestValue(leftHandDevices, CommonUsages.grip,                   XRDeviceEventTypes.left_grip);
-        TestValue(rightHandDevices, CommonUsages.trigger,               XRDeviceEventTypes.right_trigger);
-        TestValue(rightHandDevices, CommonUsages.grip,                  XRDeviceEventTypes.right_grip);
+            // Check the status of the grip and trigger values
+            TestValue(leftHandDevices, CommonUsages.trigger,                XRDeviceEventTypes.left_trigger);
+            TestValue(leftHandDevices, CommonUsages.grip,                   XRDeviceEventTypes.left_grip);
+            TestValue(rightHandDevices, CommonUsages.trigger,               XRDeviceEventTypes.right_trigger);
+            TestValue(rightHandDevices, CommonUsages.grip,                  XRDeviceEventTypes.right_grip);
+        }
+        else
+        {
+            // Probably running in standalone mode, so check keyboard instead
+            // Right Hand Thumbstick using arrow keys
+            if (Input.GetKey(KeyCode.UpArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, 1));
+            if (Input.GetKeyUp(KeyCode.UpArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, 0));
+
+            if (Input.GetKey(KeyCode.DownArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, -1));
+            if (Input.GetKeyUp(KeyCode.DownArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, 0));
+
+            if (Input.GetKey(KeyCode.LeftArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(-1, 0));
+            if (Input.GetKeyUp(KeyCode.LeftArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, 0));
+            
+            if (Input.GetKey(KeyCode.RightArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(1, 0));
+            if (Input.GetKeyUp(KeyCode.RightArrow)) SendVectorEvent(XRDeviceEventTypes.right_thumbstick, new Vector2(0, 0));
+
+            // Left Hand Thumbstick using wasd keys
+            if (Input.GetKey(KeyCode.W)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, 1));
+            if (Input.GetKeyUp(KeyCode.W)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, 0));
+
+            if (Input.GetKey(KeyCode.S)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, -1));
+            if (Input.GetKeyUp(KeyCode.S)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, 0));
+
+            if (Input.GetKey(KeyCode.A)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(-1, 0));
+            if (Input.GetKeyUp(KeyCode.A)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, 0));
+            
+            if (Input.GetKey(KeyCode.D)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(1, 0));
+            if (Input.GetKeyUp(KeyCode.D)) SendVectorEvent(XRDeviceEventTypes.left_thumbstick, new Vector2(0, 0));
+
+            // Mouse button left button = right hand trigger and right button = right hand grip
+            if (Input.GetMouseButtonDown(0)) SendKeyEvent(XRDeviceEventTypes.right_trigger, XRDeviceActions.CLICK, true);
+            if (Input.GetMouseButtonUp(0)) SendKeyEvent(XRDeviceEventTypes.right_trigger, XRDeviceActions.CLICK, false);
+
+            if (Input.GetMouseButtonDown(1)) SendKeyEvent(XRDeviceEventTypes.right_grip, XRDeviceActions.CLICK, true);
+            if (Input.GetMouseButtonUp(1)) SendKeyEvent(XRDeviceEventTypes.right_grip, XRDeviceActions.CLICK, false);
+
+            // Mouse scroll is a special case, useful for things like turning and scrolling where hand movement might be otherwise used
+            if (Input.mouseScrollDelta.y > 0) SendMouseEvent(XRDeviceEventTypes.mouse_scroll, XRDeviceActions.UP);
+            if (Input.mouseScrollDelta.y < 0) SendMouseEvent(XRDeviceEventTypes.mouse_scroll, XRDeviceActions.DOWN);
+        }
     }
     // ------------------------------------------------------------------------------------------------------------------------------------------------------
 }
@@ -341,10 +407,10 @@ public static class XRRig
         get
         {
             // Find the object that has the event manager on it.  It should be the only one with tag XREvents.
-            GameObject watcherGameObject = GameObject.FindWithTag("XREvents");
+            GameObject watcherGameObject = GameObject.FindWithTag(Enum.GetName(typeof(OpenXR_UX_Tags), OpenXR_UX_Tags.XREvents));
             if (watcherGameObject == null)
             {
-                Debug.Log("There is no XRRig_Manager in the SceneGraph that is tagged XREvents.");
+                Debug.Log("There is no XRRig Manager in the SceneGraph that is tagged XREvents.");
                 return null;
             }
             else
@@ -360,6 +426,12 @@ public static class XRRig
                 }
             }
         }
+    }
+
+
+    public static bool XRDataTest (XREvent theEvent, XRDeviceEventTypes eventToTrigger, XRDeviceActions eventAction)
+    {
+        return ((theEvent.eventType == XRDeviceEventTypes.mouse_scroll) && (theEvent.eventAction == XRDeviceActions.UP));
     }
 }
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------

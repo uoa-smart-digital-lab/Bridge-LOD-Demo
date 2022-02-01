@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.40435633, g: 0.43095922, b: 0.49518618, a: 1}
+  m_IndirectSpecularColor: {r: 0.43711698, g: 0.48656744, b: 0.59114957, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -447,6 +447,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -3.65, y: -45.920002, z: 0.13}
   m_LocalScale: {x: 7, y: 0.1, z: 100}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1974854155}
   m_RootOrder: 1
@@ -477,9 +478,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.606, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 223974229}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &117863408
 PrefabInstance:
@@ -629,6 +631,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -500, y: 0, z: -500}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
@@ -1750,6 +1753,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -4, y: 6.52, z: 0}
   m_LocalScale: {x: 1, y: 2, z: 60}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -2920,6 +2924,7 @@ Transform:
   m_LocalRotation: {x: 0.48296294, y: 0.22414392, z: -0.12940955, w: 0.8365163}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -4623,6 +4628,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4, y: 6, z: 0}
   m_LocalScale: {x: 1, y: 2, z: 60}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -5928,6 +5934,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.008, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 705292712}
   - {fileID: 2004457561}
@@ -6501,7 +6508,7 @@ PrefabInstance:
     - target: {fileID: 3778715541735680994, guid: 72685ff1a589e864fabab4583639fda6,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.729
+      value: 5.5
       objectReference: {fileID: 0}
     - target: {fileID: 3778715541735680994, guid: 72685ff1a589e864fabab4583639fda6,
         type: 3}
@@ -6573,16 +6580,18 @@ PrefabInstance:
       value: '<b>Welcome</b>
 
 
-        Explore the bridge to find structural problems. 
-        The RH thumbstick controls direction and rotation, whilst the LH thumbstick
-        controls height.
+        This bridge was scanned with a LIDAR scanner,
+        then processed and brought into Unity.
+
+        It is part of a larger project
+        to investigate how these sorts of technologies can be used
+
+        to assess
+        damage to such a structure.
 
 
-        Look to your hands to find various controls.
-
-
-        <i>Move
-        with the controllers to remove this message</i>'
+        <i>Move with the controllers to remove
+        this message</i>'
       objectReference: {fileID: 0}
     - target: {fileID: 6054311382688135604, guid: 72685ff1a589e864fabab4583639fda6,
         type: 3}
@@ -6889,6 +6898,25 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee,
         type: 2}
+    - target: {fileID: 7125859980178037033, guid: 72685ff1a589e864fabab4583639fda6,
+        type: 3}
+      propertyPath: m_text
+      value: '<b>Welcome to The Bridge</b>
+
+
+        This bridge was scanned with
+        a LIDAR scanner, then processed and brought into Unity.
+
+        It is part
+        of a larger project to investigate how these sorts of technologies can be
+        used
+
+        to assess damage to such a structure.
+
+
+        <i>Move with
+        the controllers to remove this message</i>'
+      objectReference: {fileID: 0}
     - target: {fileID: 7313127522693995012, guid: 72685ff1a589e864fabab4583639fda6,
         type: 3}
       propertyPath: m_fontAsset
@@ -7161,7 +7189,7 @@ LightingSettings:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Settings.lighting
-  serializedVersion: 3
+  serializedVersion: 4
   m_GIWorkflowMode: 0
   m_EnableBakedLightmaps: 1
   m_EnableRealtimeLightmaps: 0
@@ -7174,7 +7202,7 @@ LightingSettings:
   m_LightmapMaxSize: 1024
   m_BakeResolution: 40
   m_Padding: 2
-  m_TextureCompression: 1
+  m_LightmapCompression: 3
   m_AO: 0
   m_AOMaxDistance: 1
   m_CompAOExponent: 1
@@ -7215,6 +7243,7 @@ LightingSettings:
   m_PVRFilteringAtrousPositionSigmaDirect: 0.5
   m_PVRFilteringAtrousPositionSigmaIndirect: 2
   m_PVRFilteringAtrousPositionSigmaAO: 1
+  m_PVRTiledBaking: 0
 --- !u!1001 &1973666470
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7316,6 +7345,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.65, y: 51.13, z: -0.13}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2103238272}
   - {fileID: 53736903}
@@ -7769,6 +7799,7 @@ Transform:
   m_LocalRotation: {x: -0.6995734, y: -0.113082245, z: -0.16615732, w: 0.6857122}
   m_LocalPosition: {x: 0.22258711, y: -0.018821716, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 261440894}
   - {fileID: 705124633}
